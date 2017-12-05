@@ -99,15 +99,6 @@ def folder_correct(f, make_file=False):
     else:
         return f
 
-# Builds the LaTeX flow chart
-def build_tex(name, folder):
-    filepath = folder_correct(folder + name+".tex")
-    sb.call("pdflatex %s"%filepath, shell=True)
-    sb.call("mv *.pdf %s"%(folder), shell=True )
-    sb.call("mv *.aux %sjunk/"%folder, shell=True)
-    sb.call("mv *.log %sjunk/"%folder, shell=True)
-    
-
 # Saves the LaTeX flow chart code
 def Save_Flow(filepath, tex_code):
     filepath = folder_correct(filepath)
@@ -116,14 +107,14 @@ def Save_Flow(filepath, tex_code):
     f.close()
 
 # Prints in a nice way to the terminal
-def printer(fncs, fname,calls, call_on, to_print):
+def printer(fncs, fname,calls, to_print):
     if not to_print:
         to_print = fncs.keys()
     for i in fncs:
-        if call_on:
+        if calls:
             print("\n")
         if i in to_print:
             print("%s %i:\t%s"%(fname, i, fncs[i][0]))
-            if call_on:
+            if calls:
                 for calli, call in enumerate(calls[i]):
                     print("\tCall %i:   %s"%(calli+1, call.strip()))

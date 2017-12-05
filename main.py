@@ -18,16 +18,19 @@ ltxt = io.open_read_close(filepath)
 
 
 subroutines, sub_beg_indices, _ = txt_lib.splicing(ltxt, "subroutine", "(", "end subroutine")
-calls = {i:txt_lib.splicing(subroutines[i][1][:], "call", "(", ")", d_on=False)[0] for i in subroutines}
+if args.c:
+    calls = {i:txt_lib.splicing(subroutines[i][1][:], "call", "(", ")", d_on=False)[0] for i in subroutines}
 functions, sub_beg_indices, _ = txt_lib.splicing(ltxt, "function", "(", "end function", start_d_index=len(subroutines)+1)
-for i in functions:
-    calls[i] = txt_lib.splicing(functions[i][1][:], "call", "(", ")", d_on=False)[0]
-
-io.printer(subroutines, "Subroutines", calls, True, False)
-io.printer(functions, "Functions", calls, True, False)
+if args.c:
+    for i in functions:
+        calls[i] = txt_lib.splicing(functions[i][1][:], "call", "(", ")", d_on=False)[0]
+else:
+    calls = False
+io.printer(subroutines, "Subroutines", calls, False)
+io.printer(functions, "Functions", calls, False)
 
 if args.f:
-    flow_chart_text = ltx.flow_chart(filepath, subroutines, calls=False, functions=False)
+    flow_chart_text = ltx.flow_chart(filepath, subroutines, calls=calls, functions=False)
     
     tex_folderpath =  '/home/oem/Documents/PhD/Code/flow_chart_creator/flow_charts/'
     tex_folderpath = io.folder_correct(tex_folderpath)
@@ -35,6 +38,7 @@ if args.f:
     tex_folderpath += mod_name
     tex_folderpath = io.folder_correct(tex_folderpath)
     io.check_mkdir(tex_folderpath)
-    tex_filepath = tex_folderpath+"flow.tex"
+    tex_filepath = tex_folderpath+mod_name+".tex"
     
     io.Save_Flow(tex_filepath, flow_chart_text)
+    ltx.build_tex(tex_folderpath, mod_name)
