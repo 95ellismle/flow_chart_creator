@@ -31,6 +31,15 @@ def end_index(ltxt, begin_index, end_statement, disallowed_chars):
             break
     return end_index
 
+# Extracts the filename from the path
+def path2name(filepath):
+    p = filepath.split("/")
+    p = p[-1][:p[-1].find('.')]
+    p = p.replace("_", " ")
+    p = ' '.join([i[0].upper() + i[1:].lower() for i in p.split(' ')])
+    return p
+
+
 # Will splice the line to get the name of the subroutine/call etc...
 def line_splice(line, statement, begin_statement):
     line = line.lower()
@@ -49,7 +58,7 @@ def align(string, len_line=5, rl='r'):
         return string + "".join([" " for i in xrange(num_spaces)])
 
 # Calls the correct functions in order.
-def splicing(ltxt, statement, begin_statement, end_statement, d_on=True):
+def splicing(ltxt, statement, begin_statement, end_statement, d_on=True, start_d_index=1):
     begin_indices = begin_index(ltxt, statement, begin_statement, ['!', "'", '"', ' ', '%'])
     end_indices = [end_index(ltxt[i:], i, end_statement, ['!', "'", '"', '%']) for i in begin_indices]
     splices = {}
@@ -57,7 +66,7 @@ def splicing(ltxt, statement, begin_statement, end_statement, d_on=True):
         for i in range(len(begin_indices)):
             name = line_splice(ltxt[begin_indices[i]], statement, begin_statement)
             txt = ltxt[begin_indices[i]:end_indices[i]+1]
-            splices[i+1] = (name, txt)
+            splices[i+start_d_index] = (name, txt)
     else:
         splices = [line_splice(ltxt[i], statement, begin_statement) for i in begin_indices]
     return splices, begin_indices, end_indices

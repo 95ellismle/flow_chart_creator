@@ -33,6 +33,28 @@ def open_read_close(path):
     f.close()
     return txt
 
+#Checks if the directory exists and makes it if not
+def check_mkdir(path, min_depth=2, max_folders=2):
+    path = folder_correct(path)
+    lpath = path.split('/')
+    act_folders = []
+    for i in range(2,len(lpath)):
+        sub_path = '/'.join(lpath[:i]) 
+        if not os.path.isdir(sub_path):
+            act_folders.append(False)
+        else:
+            act_folders.append(True)
+    if not all(act_folders[:min_depth]):
+        raise(IOError("The required number of folders to be created exceeds the amount allowed."))
+    if not all(act_folders[:-max_folders]):
+        raise(IOError("Too many folders need to be created please check the filepaths."))
+    else:
+        for i in range(2,len(lpath)):
+            sub_path = '/'.join(lpath[:i]) 
+            if not os.path.isdir(sub_path):
+                os.mkdir(sub_path)
+    return True
+
 # Checks if a filepath or folderpath exists
 def path_leads_somewhere(path):
     if os.path.isfile(path) or os.path.isdir(path):
@@ -103,5 +125,5 @@ def printer(fncs, fname,calls, call_on, to_print):
         if i in to_print:
             print("%s %i:\t%s"%(fname, i, fncs[i][0]))
             if call_on:
-                for i, call in enumerate(calls[i]):
-                    print("\tCall %i:   %s"%(i+1, call.strip()))
+                for calli, call in enumerate(calls[i]):
+                    print("\tCall %i:   %s"%(calli+1, call.strip()))
